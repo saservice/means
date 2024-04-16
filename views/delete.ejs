@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>means</title>
+  <link rel="stylesheet" type="text/css" href="/public/css/home.css">
+</head>
+<body>
+<header class="common">
+  <%- include('header'); %>
+</header>
+<div class="account-container">
+  <h2>Note: If you delete your account, you will not be able to use the comment function.</h2>
+  <div class="login-panel">
+    <h3>delete account</h3>
+    <form action="/delete" method="post">
+      <input type="submit" value="delete">
+    </form>
+  </div>
+</div>
+
+
+<footer class="common">
+  <%- include('footer'); %>
+</footer>
+</body>
+</html>

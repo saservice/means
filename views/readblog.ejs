@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>means</title>
+  <link rel="stylesheet" type="text/css" href="/public/css/home.css">
+</head>
+
+<body>
+  <header class="common">
+    <%- include('header'); %>
+  </header>
+  <main>
+    <h1><%= blog.title %></h1>
+    <p class="text"><%= blog.text %></p>
+    <!-- instagramみたいな画像表示にする -->
+    <div class="img-container">
+      <div class="artImg">
+        <img src="<%= blog.image1 %> " width="400" height="400">
+        <img src="<%= blog.image2 %> " width="400" height="400">
+        <img src="<%= blog.image3 %> " width="400" height="400">
+      </div>
+    </div>
+
+    <div class="thread-section">
+
+    </div>
+    <form class="form-section">
+      <p>comment</p>
+      <textarea id="inputContent" rows="10" cols="30"></textarea>
+      <br />
+      <button id="submitButton" type="submit">送信</button>
+    </form>
+    </div>
+
+
+
+
+    <footer class="common">
+      <%- include('footer'); %>
+    </footer>
+</body>
+
+</html>

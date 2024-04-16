@@ -1,0 +1,16 @@
+
+    <a class="title1" href="/">?means¿</a>
+    <h3>Welcome,<%=locals.username%>.</h3>
+    <div class="menu">
+    <!-- <a href="/archive">archive</a> -->
+    <a href="/blog">blog</a>
+    <a href="/contact">contact</a>
+    <% if(locals.isLoggedIn) {%>
+    <a href="/logout">logout</a>
+    <% } else { %>
+    <a href="/login">login</a>
+    <a href="/signup">sign up</a>
+    <% }%>
+    </div>
+  
+ 

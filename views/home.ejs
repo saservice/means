@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>means</title>
+  <link rel="stylesheet" type="text/css" href="/public/css/home.css">
+</head>
+<body>
+<div class="container">
+  <header class="common">
+    <%- include('header'); %>
+  </header>
+  <div class="top-wrapper">
+    <h2>We need true information.</h2>
+  </div>
+  
+  <main>
+  <div class="ariticles-container">
+    <ul>
+      <% blog.forEach(function (blog) { %>
+        <li><a href="/readblog/<%= blog.id%>"><%= blog.title%></a>
+          <img src="<%=blog.image1%>" height="160" width="160">
+        </li>
+          <% }); %>
+    </ul>
+  </div>
+
+    
+  </main>
+  
+  <footer class="common">
+    <%- include('footer'); %>
+  </footer>
+</div>
+
+</body>
+</html>
