@@ -10,17 +10,18 @@
 <header class="common">
   <%- include('header'); %>
 </header>
-<div class="account-container">
-  <h2>Note: If you delete your account, you will not be able to use the comment function.</h2>
-  <div class="login-panel">
-    <h3>delete account</h3>
-    <form action="/delete" method="post">
-      <input type="submit" value="delete">
-    </form>
+<main>
+  <div class="account-container">
+    <h2>Note: If you delete your account, you will not be able to use the comment function.</h2>
+    <div class="login-panel">
+      <h3>delete account</h3>
+      <form action="/delete" method="post">
+        <input type="submit" value="delete">
+        <a href="/">Return to Top Page</a>
+      </form>
+    </div>
   </div>
-</div>
-
-
+</main>
 <footer class="common">
   <%- include('footer'); %>
 </footer>

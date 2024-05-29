@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>means</title>
+  <link rel="stylesheet" type="text/css" href="/public/css/home.css">
+</head>
+<body>
+  <header class="common">
+    <%- include('header'); %>
+  </header>
+  <main>
+    <div class="form-container">
+      <ul class="tabs">
+        <li><a href="" class="active" data-id="blog">blog</a></li>
+        <li><a href="" data-id="archives">archives</a></li>
+      </ul>
+      <div class="forms"> 
+          <div class="form active" id="blog">
+            <div class="blog-form">
+              <form action="/postblog" method="post">
+                <h2>blog</h2>
+                <p>title</p>
+                <input type="text" name="title">
+                <p>text</p>
+                <textarea name="text" rows="4" cols="50"></textarea>
+                <p>images</p>              
+                <ul class="images">
+                  <li><input type = "text" name="image1" value="/public/images/"></li>
+                  <li><input type = "text" name="image2" value="/public/images/"></li>
+                  <li><input type = "text" name="image3" value="/public/images/"></li>
+                </ul>
+                <input type="submit" value="upload">
+              </form>
+            </div>
+          </div>
+          <div class="form" id="archives">
+            <div class="archives-form">
+              <h2>archives</h2>
+              <form action="/postarchives" method="post">
+                <p>name</p>
+                <input type="text" name="name">
+                <p>text</p>
+                <textarea name="text" rows="4" cols="50"></textarea>
+                <p>images</p>
+                <ul class="images">
+                  <li><input type = "text" name="image1" value="/public/images/"></li>
+                  <li><input type = "text" name="image2" value="/public/images/"></li>
+                  <li><input type = "text" name="image3" value="/public/images/"></li>
+                </ul>
+               
+                <input type="submit" value="upload">
+              </form>
+            </div>
+          </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="common">
+    <%- include('footer'); %>
+  </footer>
+  <script>
+    const tabItems = document.querySelectorAll('.tabs li a');
+    const forms = document.querySelectorAll('.form');
+
+    tabItems.forEach(clickItem => {
+      clickItem.addEventListener('click', e => {
+        e.preventDefault();
+
+        tabItems.forEach(Item => {
+          Item.classList.remove('active');
+          clickItem.classList.add('active');
+
+          forms.forEach(form => {
+            form.classList.remove('active');
+          });
+          document.getElementById(clickItem.dataset.id).classList.add('active');
+
+        });
+      });
+    });
+  </script>
+</body>
+</html>

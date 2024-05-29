@@ -11,15 +11,13 @@
   <%- include('header'); %>
 </header>
 <main>
-  <div class="blog-container">
-    <ul class="blogs">
-      <% blog.forEach(function (blog) { %>
-          <li><a href="/readblog/<%= blog.id %>">•<%= blog.title %></a></li>
-        <% }); %>
-      </ul>
-  </div>
+  <ul class="archives">
+    <% archives.forEach(function (archive) { %>
+        <li><a href="/readarchive/<%= archive.id %>"><%= archive.name %></a><br><img class="image1" src="<%= archive.image1 %>"></li>
+      <% }); %>
+    </ul>
+  
 </main>
-
 
 <footer class="common">
   <%- include('footer'); %>

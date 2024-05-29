@@ -1,51 +1,27 @@
-app.post('/delete', (req, res) => {
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
-  
-  // エラー配列の初期化
+app.post('/add-comment', (req, res) => {
+  const { blog_id, contents } = req.body;
   const errors = [];
 
-  // 入力値の検証
-  if (username === '') {
-    errors.push('User name is empty.');
-  }
-  if (email === '') {
-    errors.push('Email is empty.');
-  }
-  if (password === '') {
-    errors.push('Password is empty.');
+  // コメントが空白やスペースのみであるかをチェック
+  if (!contents.trim()) {
+    errors.push('Contents are empty.');
+    // コメントが空の場合はエラーメッセージを返す
+    res.render('readblog', { blog_id: blog_id, errors: errors }); // エラーを渡す
+
+    return;
   }
 
-  console.log(errors);
+  // username をリクエストに追加
+  req.body.username = res.locals.username;
 
-  // エラーがある場合はエラーメッセージをレンダリング
-  if (errors.length > 0) {
-    res.render('delete', { errors: errors });
-  } else {
-    // 削除クエリを定義
-    const deleteQuery = 'DELETE FROM users WHERE id = ?';
-    
-    // セッションから userId を取得
-    const userId = req.session.userId;
-
-    // パスワードのハッシュ化
-    bcrypt.hash(password, 10, (error, hash) => {
-      if (error) {
-        console.error('Error during delete account:', error);
-        res.status(500).send('An error occurred during signup. Please try again later.');
-      } else {
-        // ハッシュ化が完了したらユーザーを削除
-        db.run(deleteQuery, [userId], function (err) {
-          if (err) {
-            console.error('Error during delete account:', err);
-            res.status(500).send('An error occurred during delete account. Please try again later.');
-          } else {
-            res.redirect('/');
-          }
-        });
-      }
-    });
-  }
+  const query = 'INSERT INTO comments (blog_id, username, contents) VALUES (?, ?, ?)';
+  db.run(query, [blog_id, req.body.username, contents], (err) => {
+    if (err) {
+      console.error('Error adding comment:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      // コメントの追加が成功した場合は、該当のブログ記事の表示ページにリダイレクトする
+      res.redirect('/readblog/' + blog_id);
+    }
+  });
 });
-
