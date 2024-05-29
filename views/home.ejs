@@ -12,27 +12,33 @@
     <%- include('header'); %>
   </header>
   <div class="top-wrapper">
-    <h2>We need true information.</h2>
+    <h2>Purpose: To archive information</h2>
   </div>
   
-  <main>
-  <div class="ariticles-container">
-    <ul>
-      <% blog.forEach(function (blog) { %>
-        <li><a href="/readblog/<%= blog.id%>"><%= blog.title%></a>
-          <img src="<%=blog.image1%>" height="160" width="160">
-        </li>
-          <% }); %>
-    </ul>
-  </div>
-
-    
-  </main>
-  
+  <!-- 背景の画像切り替え -->
   <footer class="common">
     <%- include('footer'); %>
   </footer>
 </div>
 
+<script>
+const images = [
+  '/public/images/1710257899068--acgsherpafleece.jpg',
+  '/public/images/acgshoes.jpg'
+];
+
+let currentIndex = 0;
+const topWrapper = document.querySelector('.top-wrapper');
+
+function switchBackgroundImage() {
+  currentIndex = (currentIndex + 1) % images.length;
+  topWrapper.style.backgroundImage = `url('${images[currentIndex]}')`;
+}
+
+topWrapper.style.backgroundImage = `url('${images[currentIndex]}')`;
+
+setInterval(switchBackgroundImage, 5000);
+
+</script>
 </body>
 </html>

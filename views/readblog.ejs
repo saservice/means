@@ -6,41 +6,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>means</title>
   <link rel="stylesheet" type="text/css" href="/public/css/home.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
 
 <body>
-  <header class="common">
-    <%- include('header'); %>
-  </header>
-  <main>
-    <h1><%= blog.title %></h1>
-    <p class="text"><%= blog.text %></p>
-    <!-- instagramみたいな画像表示にする -->
-    <div class="img-container">
-      <div class="artImg">
-        <img src="<%= blog.image1 %> " width="400" height="400">
-        <img src="<%= blog.image2 %> " width="400" height="400">
-        <img src="<%= blog.image3 %> " width="400" height="400">
+  <div class="wrapper">
+    <header class="common">
+      <%- include('header'); %>
+    </header>
+    <main>
+      <div class="article-container">
+        <h1><%= blog.title %></h1>
+        <p class="text"><%= blog.text %></p>
+            <!-- Slider main container -->
+            <div class="swiper">
+              <!-- Additional required wrapper -->
+              <div class="swiper-wrapper">
+                <!-- Slides -->
+                <% if (blog.image1) { %>
+                  <div class="swiper-slide"><img class="img" src="<%= blog.image1 %>"></div>
+                <% } %>
+                <% if (blog.image2) { %>
+                  <div class="swiper-slide"><img class="img" src="<%= blog.image2 %>"></div>
+                <% } %>
+                <% if (blog.image3) { %>
+                  <div class="swiper-slide"><img class="img" src="<%= blog.image3 %>"></div>
+                <% } %>
+              </div>
+              <!-- If we need pagination -->
+              <div class="swiper-pagination"></div>
+            
+              <!-- If we need navigation buttons -->
+              <div class="swiper-button-prev"></div>
+              <div class="swiper-button-next"></div>
+            
+              <!-- If we need scrollbar -->
+              <div class="swiper-scrollbar"></div>
+            </div>            
       </div>
-    </div>
 
-    <div class="thread-section">
+      <div class="comment-form">
 
-    </div>
-    <form class="form-section">
-      <p>comment</p>
-      <textarea id="inputContent" rows="10" cols="30"></textarea>
-      <br />
-      <button id="submitButton" type="submit">送信</button>
-    </form>
-    </div>
-
-
-
-
+      <% if(userId) { %>
+        <!-- コメントの表示 -->
+        <h4>Comments</h4>
+        <ul>
+          <% comments.forEach(function(comment) { %>
+          <li><%= comment.username %></li>
+          <li><%= comment.contents %></li>
+          <% }); %>
+        </ul>
+        <form action="/add-comment" method="POST">
+          <% if (errors.length > 0) { %>
+          <ul class="errors">
+            <% errors.forEach(error => { %>
+            <li><%=error%></li>
+            <% }); %>
+          </ul>
+          <% }; %>
+          <input type="hidden" name="blog_id" value="<%= blog.id %>">
+          <textarea name="contents" placeholder="Add your comment"></textarea>
+          <button type="submit">Submit</button>
+        </form>
+        <% } else { %>
+        <h3>Please login and comment.</h3>
+        <a href="/login">login</a>
+        <p>or</p>
+        <a href="/signup">sign up</a>
+        <% } %>
+      </div>
+    </main>
     <footer class="common">
       <%- include('footer'); %>
     </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper('.swiper', {
+      // Optional parameters
+      loop: true,
+      speed: 400,
+
+      // If we need pagination
+      pagination: {
+        el: '.swiper-pagination',
+      },
+
+      // Navigation arrows
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+
+      // And if we need scrollbar
+      scrollbar: {
+        el: '.swiper-scrollbar',
+        hide: 'true',
+      },
+    });
+  </script>
 </body>
 
 </html>

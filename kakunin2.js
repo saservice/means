@@ -1,43 +1,43 @@
-app.post('/delete', (req, res) => {
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
-  const query = 'SELECT * FROM users WHERE (username, email, password) VALUES (?, ?, ?)';
-
+app.post('/add-comment', (req, res) => {
+  const { blog_id, content } = req.body;
   const errors = [];
 
-  if (username === '') {
-    errors.push('User name is empty.');
-  }
-  if (email === '') {
-    errors.push('Email is empty.');
-  }
-  if (password === '') {
-    errors.push('Password is empty.');
-  }
-
-  console.log(errors);
-
-  if (errors.length > 0) {
-    res.render('delete', { errors: errors });
-  } else {
-    const deleteQuery = 'DELETE FROM users WHERE id = ?';
-    const userId = req.session.userId;
-
-    bcrypt.hash(password, 10, (error, hash) => {
-      if (error) {
-        console.error('Error during delete account:', error);
-        res.status(500).send('An error occurred during signup. Please try again later.');
+  // コメントが空白やスペースのみであるかをチェック
+  if (!content.trim()) {
+    errors.push('Contents are empty.');
+    // コメントが空の場合はエラーメッセージを返す
+    const query = 'SELECT * FROM blog WHERE id = ?';
+    db.get(query, [blog_id], (err, blog) => {
+      if (err) {
+        console.error('Error fetching blog by ID:', err);
+        res.status(500).send('Internal Server Error');
       } else {
-        db.run(deleteQuery, [userId], function (err) {
-          if (err) {
-            console.error('Error during delete account:', err);
-            res.status(500).send('An error occurred during delete account. Please try again later.');
-          } else {
-            res.redirect('/');
-          }
-        });
+        if (blog) {
+          db.all("SELECT * FROM comments WHERE blog_id = ?", [blog_id], (err, comments) => {
+            if (err) {
+              console.error('Error fetching comments by blog ID:', err);
+              res.status(500).send('Internal Server Error');
+            } else {
+              res.render('readblog', { blog: blog, comments: comments, userId: req.session.userId, errors: errors });
+            }
+          });
+        } else {
+          // 記事が見つからない場合はエラーを表示
+          res.status(404).send('Blog not found');
+        }
       }
     });
+    return;
   }
+
+  const query = 'INSERT INTO comments (blog_id, content) VALUES (?, ?)';
+  db.run(query, [blog_id, content], (err) => {
+    if (err) {
+      console.error('Error adding comment:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      // コメントの追加が成功した場合は、該当のブログ記事の表示ページにリダイレクトする
+      res.redirect('/readblog/' + blog_id);
+    }
+  });
 });

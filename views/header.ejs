@@ -2,15 +2,40 @@
     <a class="title1" href="/">?means¿</a>
     <h3>Welcome,<%=locals.username%>.</h3>
     <div class="menu">
-    <!-- <a href="/archive">archive</a> -->
-    <a href="/blog">blog</a>
-    <a href="/contact">contact</a>
-    <% if(locals.isLoggedIn) {%>
-    <a href="/logout">logout</a>
-    <% } else { %>
-    <a href="/login">login</a>
-    <a href="/signup">sign up</a>
-    <% }%>
+        <div class="menu-select">
+            <ul>
+                <li><a href="/archives">archives</a></li>
+                <li><a href="/blog">blog</a></li>
+                    <% if(locals.isLoggedIn) {%>
+                        <li><a href="/logout">logout</a></li>
+                        <% } else { %>
+                        <li><a href="/login">login</a></li>
+                        <li><a href="/signup">sign up</a></li>
+                         <% }%>
+                    <% if(locals.username === 'sas') {%>
+                        <li><a href="/post">post</a></li>
+                        <% }%>
+            </ul>
+        </div>
+        <div class="toggle-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div id="mask"></div>
     </div>
+
+    <script>
+        let menu = document.querySelector(".menu");
+        let btn = document.querySelector(".toggle-btn");
+        let mask = document.querySelector("#mask");
+
+        btn.onclick = () => {
+            menu.classList.toggle("open");
+        }
+        mask.onclick = () => {
+            menu.classList.toggle("open");
+        }
+    </script>
   
  

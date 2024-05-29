@@ -10,26 +10,28 @@
 <header class="common">
   <%- include('header'); %>
 </header>
-<div class="account-container">
-  <h2>Log in and use ?means¿ as a better place to share information.</h2>
-  <div class="login-panel">
-    <h3>login</h3>
-    <% if (errors.length > 0) { %>
-      <ul class="errors">
-        <% errors.forEach(error => { %>
-          <li><%= error %></li>
-        <% }); %>
-      </ul>
-    <% } %>
-    <form action="/login" method="post">
-      <p>e-mail</p>
-      <input type="text" name="email">
-      <p>password</p>
-      <input type="password" name="password">
-      <input type="submit" value="login">
-    </form>
+<main>
+  <div class="account-container">
+    <h2>Log in and use ?means¿ as a better place to share information.</h2>
+    <div class="login-panel">
+      <h3>login</h3>
+      <% if (errors.length > 0) { %>
+        <ul class="errors">
+          <% errors.forEach(error => { %>
+            <li><%= error %></li>
+          <% }); %>
+        </ul>
+      <% } %>
+      <form action="/login" method="post">
+        <p>e-mail</p>
+        <input type="text" name="email">
+        <p>password</p>
+        <input type="password" name="password">
+        <input type="submit" value="login">
+      </form>
+    </div>
   </div>
-</div>
+</main>
 
 <footer class="common">
   <%- include('footer'); %>

@@ -7,8 +7,6 @@ const server = http.createServer(app);
 const PORT = 3000;
 const session = require('express-session');
 const bcrypt = require('bcrypt');
-const mongoose = require("mongoose");
-
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./contents.db', sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
@@ -34,6 +32,7 @@ app.use(
   })
 );
 
+//セッションIDの受け渡し
 app.use((req, res, next) => {
   if (req.session.userId === undefined) {
     console.log('You are not logged in.');
@@ -47,17 +46,80 @@ app.use((req, res, next) => {
   next();
 });
 
+//ホーム画面の表示
 app.get("/", (req, res) => {
-  db.all("SELECT * FROM blog", (err, data) => {
+  res.render('home');
+});
+
+//archives記事のタイトル表示
+app.get('/archives', (req, res) => {
+  db.all("SELECT * FROM archives", (err, data) => {
     if (err) {
       console.log("err");
     } else {
-      res.render('home', { blog: data }); // blog データを渡す
+      res.render('archives', { archives: data }); // archives データを渡す
     }
   });
 });
 
-//記事のタイトル表示
+//archives記事の表示
+app.get('/readarchive/:id', (req, res) => {
+  const archiveId = req.params.id;
+  const query = 'SELECT * FROM archives WHERE id = ?';
+  db.get(query, [archiveId], (err, archive) => {
+      if (err) {
+          console.error('Error fetching archive by ID:', err);
+          res.status(500).send('Internal Server Error');
+      } else {
+          if (archive) {
+              // 記事が見つかった場合
+            if (err) {
+                console.error('Error fetching comments by blog ID:', err);
+                res.status(500).send('Internal Server Error');
+            } else {
+              res.render('readarchive', { archive: archive});
+
+            }
+              
+          } else {
+              // 記事が見つからない場合はエラーを表示
+              res.status(404).send('Blog not found');
+          }
+      }
+  });
+});
+
+app.get('/readblog/:id', (req, res) => {
+  const blogId = req.params.id;
+  const query = 'SELECT * FROM blog WHERE id = ?';
+  const errors = [];
+  db.get(query, [blogId], (err, blog) => {
+      if (err) {
+          console.error('Error fetching blog by ID:', err);
+          res.status(500).send('Internal Server Error');
+      } else {
+          if (blog) {
+              // 記事が見つかった場合
+              db.all("SELECT * FROM comments WHERE blog_id = ?", [blogId], (err, comments) => {
+                  if (err) {
+                      console.error('Error fetching comments by blog ID:', err);
+                      res.status(500).send('Internal Server Error');
+                  } else {
+                    res.render('readblog', { blog: blog, comments: comments, userId: req.session.userId, errors:errors});
+                  }
+              });
+          } else {
+              // 記事が見つからない場合はエラーを表示
+              res.status(404).send('Blog not found');
+          }
+      }
+  });
+});
+
+
+
+
+//blog記事のタイトル表示
 app.get('/blog', (req, res) => {
   db.all("SELECT * FROM blog", (err, data) => {
     if (err) {
@@ -68,33 +130,90 @@ app.get('/blog', (req, res) => {
   });
 });
 
-
-//記事の表示
+//blog記事の表示
 app.get('/readblog/:id', (req, res) => {
-  //:idはblog.ejsファイルのaタグでクリックした記事のidが入っている
   const blogId = req.params.id;
-  // データベースから記事を取得するクエリ
   const query = 'SELECT * FROM blog WHERE id = ?';
-  db.get(query, [blogId], (err, row) => {
-    //db.getを実行したことでblogIdがqueryのWHERE id = ? の ?(プレースホルダー) に該当することが確定する
+  db.get(query, [blogId], (err, blog) => {
+      if (err) {
+          console.error('Error fetching blog by ID:', err);
+          res.status(500).send('Internal Server Error');
+      } else {
+          if (blog) {
+              // 記事が見つかった場合
+              db.all(query, [blogId], (err, comments) => {
+                  if (err) {
+                      console.error('Error fetching comments by blog ID:', err);
+                      res.status(500).send('Internal Server Error');
+                  } else {
+                    res.render('readblog', { blog: blog, comments: comments, error: null });
+
+                  }
+              });
+          } else {
+              // 記事が見つからない場合はエラーを表示
+              res.status(404).send('Blog not found');
+          }
+      }
+  });
+});
+
+
+// //コメントの追加•リダイレクト
+app.post('/add-comment', (req, res) => {
+  const { blog_id, contents } = req.body;
+  const errors = [];
+
+  // コメントが空白やスペースのみであるかをチェック
+  if (!contents.trim()) {
+    errors.push('Contents are empty.');
+    // コメントが空の場合はエラーメッセージを返す
+    const query = 'SELECT * FROM blog WHERE id = ?';
+    db.get(query, [blog_id], (err, blog) => {
+      if (err) {
+        console.error('Error fetching blog by ID:', err);
+        res.status(500).send('Internal Server Error');
+      } else {
+        if (blog) {
+          db.all("SELECT * FROM comments WHERE blog_id = ?", [blog_id], (err, comments) => {
+            if (err) {
+              console.error('Error fetching comments by blog ID:', err);
+              res.status(500).send('Internal Server Error');
+            } else {
+              res.render('readblog', { blog: blog, comments: comments, userId: req.session.userId, errors: errors });
+            }
+          });
+        } else {
+          // 記事が見つからない場合はエラーを表示
+          res.status(404).send('Blog not found');
+        }
+      }
+    });
+    return;
+  }
+  // username をリクエストに追加
+  req.body.username = res.locals.username;
+
+  const query = 'INSERT INTO comments (blog_id, username, contents) VALUES (?, ?, ?)';
+  db.run(query, [blog_id, req.body.username, contents], (err) => {
     if (err) {
-      console.error('Error fetching blog by ID:', err);
+      console.error('Error adding comment:', err);
       res.status(500).send('Internal Server Error');
     } else {
-      if (row) {
-        // 記事が見つかった場合
-        res.render('readblog', { blog: row });
-        //readblogにrow(id番目の記事の情報（カラム）を渡している)
-      }
+      // コメントの追加が成功した場合は、該当のブログ記事の表示ページにリダイレクトする
+      res.redirect('/readblog/' + blog_id);
     }
   });
 });
 
+
+//ログイン画面遷移
 app.get('/login', (req, res) => {
   res.render('login.ejs', { errors: [] });
 
 });
 
+//ログイン処理
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -142,16 +261,15 @@ app.post('/login', (req, res) => {
   });
 });
 
-
+//ユーザー登録画面遷移
 app.get('/signup', (req, res) => {
   res.render('signup', { errors: [] });
 });
 
+//ユーザー登録処理
 app.post('/signup', (req, res, next) => {
   console.log('Empty check of input values');
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
+  const { username, email, password } = req.body;
 
   const errors = [];
 
@@ -176,12 +294,12 @@ app.post('/signup', (req, res, next) => {
   (req, res, next) => {
     console.log('Check for duplicate email addresses');
     const email = req.body.email;
-    const query = 'SELECT * FROM users WHERE email = ?'
+    const query = 'SELECT * FROM users WHERE email = ?';
     const errors = [];
 
     db.get(query, [email], (error, results) => {
       if (results) {
-        errors.push('Sign up failed.');
+        const errors = ['Your email address is already registered.'];
         res.render('signup.ejs', { errors: errors });
       } else {
         next();
@@ -191,11 +309,16 @@ app.post('/signup', (req, res, next) => {
   },
   (req, res) => {
     console.log('sign up');
-    const username = req.body.username;
-    const email = req.body.email;
-    const password = req.body.password;
+    const { username, email, password } = req.body;
     const query = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
+  
     bcrypt.hash(password, 10, (error, hash) => {
+      if (error) {
+        console.error('Error during password hashing:', error);
+        res.status(500).send('An error occurred during signup. Please try again later.');
+        return;
+      }
+  
       db.run(query, [username, email, hash], function (err) {
         if (err) {
           console.error('Error during signup:', err);
@@ -209,27 +332,72 @@ app.post('/signup', (req, res, next) => {
     });
   });
 
-
+//ログアウト処理
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/');
   });
 });
 
+//blog•archivesのpost処理
+app.get('/post', (req, res) => {
+  res.render('post');
+});
+
+app.post('/postarchives', (req, res) => {
+  const { name, text, image1, image2, image3 } = req.body;
+  const query = 'INSERT INTO archives (name, text, image1, image2, image3) VALUES (?, ?, ?, ?, ?)';
+  db.run(query, [name, text, image1, image2, image3], function(err) {
+    if (err) {
+      console.error('Error adding archives:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      const archive_id = this.lastID;
+      res.redirect('/readarchive/' + archive_id);
+    }
+  });
+});
+
+app.post('/postblog', (req, res) => {
+  const { title, text, image1, image2, image3 } = req.body;
+  const query = 'INSERT INTO blog (title, text, image1, image2, image3) VALUES (?, ?, ?, ?, ?)';
+  db.run(query, [title, text, image1, image2, image3], function(err) {
+    if (err) {
+      console.error('Error adding blog:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      const blog_id = this.lastID;
+      res.redirect('/readblog/' + blog_id);
+    }
+  });
+});
+
+
+
+//アカウント削除画面
 app.get('/delete', (req,res) => {
   res.render('delete', { errors: [] });
 });
-
+//アカウント削除処理
 app.post('/delete', (req, res) => {
-    const deleteQuery = 'DELETE FROM users WHERE id = ?';
-    const userId = req.session.userId;
-    db.run(deleteQuery, [userId], function (err) {
+  const query = 'DELETE FROM users WHERE id = ?';
+  const userId = req.session.userId;
+  db.run(query, [userId], function (err) {
       if (err) {
-        console.error('Error during delete account:', err);
-        res.status(500).send('An error occurred during delete account. Please try again later.');
+          console.error('Error during delete account:', err);
+          res.status(500).send('An error occurred during delete account. Please try again later.');
       } else {
-        res.redirect('/');
+          // セッションを破棄してからリダイレクト
+          req.session.destroy((err) => {
+              if (err) {
+                  console.error('Error during session destruction:', err);
+                  res.status(500).send('An error occurred during session destruction. Please try again later.');
+              } else {
+                  res.redirect('/');
+              }
+          });
       }
-    });
+  });
 });
+
 
