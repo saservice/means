@@ -18,63 +18,74 @@
       <div class="article-container">
         <h1><%= blog.title %></h1>
         <p class="text"><%= blog.text %></p>
-            <!-- Slider main container -->
-            <div class="swiper">
-              <!-- Additional required wrapper -->
-              <div class="swiper-wrapper">
-                <!-- Slides -->
-                <% if (blog.image1) { %>
-                  <div class="swiper-slide"><img class="img" src="<%= blog.image1 %>"></div>
-                <% } %>
-                <% if (blog.image2) { %>
-                  <div class="swiper-slide"><img class="img" src="<%= blog.image2 %>"></div>
-                <% } %>
-                <% if (blog.image3) { %>
-                  <div class="swiper-slide"><img class="img" src="<%= blog.image3 %>"></div>
-                <% } %>
-              </div>
-              <!-- If we need pagination -->
-              <div class="swiper-pagination"></div>
-            
-              <!-- If we need navigation buttons -->
-              <div class="swiper-button-prev"></div>
-              <div class="swiper-button-next"></div>
-            
-              <!-- If we need scrollbar -->
-              <div class="swiper-scrollbar"></div>
-            </div>            
+        <!-- Slider main container -->
+        <div class="swiper">
+          <!-- Additional required wrapper -->
+          <div class="swiper-wrapper">
+            <!-- Slides -->
+            <% if (blog.image1) { %>
+            <div class="swiper-slide"><img class="img" src="<%= blog.image1 %>"></div>
+            <% } %>
+            <% if (blog.image2) { %>
+            <div class="swiper-slide"><img class="img" src="<%= blog.image2 %>"></div>
+            <% } %>
+            <% if (blog.image3) { %>
+            <div class="swiper-slide"><img class="img" src="<%= blog.image3 %>"></div>
+            <% } %>
+          </div>
+          <!-- If we need pagination -->
+          <div class="swiper-pagination"></div>
+
+          <!-- If we need navigation buttons -->
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>
+
+          <!-- If we need scrollbar -->
+          <div class="swiper-scrollbar"></div>
+        </div>
       </div>
 
       <div class="comment-form">
-
-      <% if(userId) { %>
-        <!-- コメントの表示 -->
         <h4>Comments</h4>
-        <ul>
-          <% comments.forEach(function(comment) { %>
-          <li><%= comment.username %></li>
-          <li><%= comment.contents %></li>
-          <% }); %>
-        </ul>
-        <form action="/add-comment" method="POST">
-          <% if (errors.length > 0) { %>
-          <ul class="errors">
-            <% errors.forEach(error => { %>
-            <li><%=error%></li>
-            <% }); %>
-          </ul>
-          <% }; %>
-          <input type="hidden" name="blog_id" value="<%= blog.id %>">
-          <textarea name="contents" placeholder="Add your comment"></textarea>
-          <button type="submit">Submit</button>
-        </form>
-        <% } else { %>
-        <h3>Please login and comment.</h3>
-        <a href="/login">login</a>
-        <p>or</p>
-        <a href="/signup">sign up</a>
-        <% } %>
+        
+        <% if(userId) { %>
+        <!-- コメントの表示 -->
+        <div class="add-form">
+          <form action="/add-comment" method="POST">
+            <% if (errors.length > 0) { %>
+            <ul class="errors">
+              <% errors.forEach(error => { %>
+              <li><%=error%></li>
+              <% }); %>
+            </ul>
+            <% }; %>
+            <input type="hidden" name="blog_id" value="<%= blog.id %>">
+            <textarea name="contents" placeholder="Add your comment" width="80%"></textarea>
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+        <div class=""></div>
+          <% } else { %>
+          <h4>Please login and comment.</h4>
+          <a href="/login">login</a>
+          <p>or</p>
+          <a href="/signup">sign up</a>
+          <% } %>
+        
+        
+          
+          <div class="board">
+            <ul>
+              <% comments.forEach(function(comment) { %>
+              <li><%= comment.username %></li>
+              <li><%= comment.contents %></li>
+              <% }); %>
+            </ul>
+          </div>
+          
+          
       </div>
+
     </main>
     <footer class="common">
       <%- include('footer'); %>
@@ -105,6 +116,18 @@
       },
     });
   </script>
+  <script>
+    //commentsのcolor指定
+    const colors = ['#b0c4de', '#555555'];
+  
+    const items = document.querySelectorAll('.board li');
+  
+    // 各アイテムに色を適用します
+    items.forEach((item, index) => {
+      item.style.color = colors[index % colors.length];
+    });
+  </script>
+  
 </body>
 
 </html>
