@@ -1,12 +1,4 @@
 version: 1
-backend:
-  phases:
-    preBuild:
-      commands:
-        - npm ci
-    build:
-      commands:
-        - npm run build
 frontend:
   phases:
     preBuild:
@@ -14,9 +6,9 @@ frontend:
         - npm ci
     build:
       commands:
-        - npm run build
+        - echo 'Build step is not required for this project'
   artifacts:
-    baseDirectory: /src
+    baseDirectory: .  # プロジェクトルートを指定
     files:
       - '**/*'
   cache:
