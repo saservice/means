@@ -4,7 +4,8 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
-    "build": "echo 'Build step is not required for this project'"
+    "build": "echo 'Build step is not required for this project'",
+    "start": "node app.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

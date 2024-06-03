@@ -8,9 +8,10 @@ frontend:
       commands:
         - echo 'Build step is not required for this project'
   artifacts:
-    baseDirectory: .  # プロジェクトルートを指定
+    baseDirectory: .  # プロジェクトのルートディレクトリを指定
     files:
       - '**/*'
   cache:
     paths:
       - node_modules/**/*
+
