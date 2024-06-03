@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 const http = require("http");
 const server = http.createServer(app);
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // 環境変数PORTを使用するように変更
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 const sqlite3 = require('sqlite3').verbose();
