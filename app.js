@@ -1,13 +1,16 @@
 import express from 'express';
+import bodyParser from 'body-parser';
+import http from 'http';
+import session from 'express-session';
+import bcrypt from 'bcrypt';
+import sqlite3 from 'sqlite3';
+
 const app = express();
-const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
-const http = require("http");
+
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000; // 環境変数PORTを使用するように変更
-const session = require('express-session');
-const bcrypt = require('bcrypt');
-const sqlite3 = require('sqlite3').verbose();
+
 const db = new sqlite3.Database('./contents.db', sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     return console.error(err.message);
@@ -18,9 +21,22 @@ const db = new sqlite3.Database('./contents.db', sqlite3.OPEN_CREATE | sqlite3.O
 app.set("view engine", "ejs");
 app.use('/public', express.static('public'));
 
-
+// サーバーの開始
 server.listen(PORT, () => {
-  console.log("listening on 3000");
+  console.log(`Server is running on port ${PORT}`);
+});
+
+// サーバーが適切に終了するためのハンドラ
+process.on('SIGTERM', () => {
+  server.close(() => {
+    console.log('Process terminated');
+  });
+});
+
+process.on('SIGINT', () => {
+  server.close(() => {
+    console.log('Process interrupted');
+  });
 });
 
 
